@@ -1,0 +1,200 @@
+DROP DATABASE apt;
+
+CREATE DATABASE apt;
+USE apt;
+
+SET SESSION FOREIGN_KEY_CHECKS=0;
+
+/* Drop Tables */
+
+DROP TABLE IF EXISTS myRegion;
+DROP TABLE IF EXISTS locationCode;
+DROP TABLE IF EXISTS users;
+
+/* Create Tables */
+
+CREATE TABLE locationCode
+(
+lCode int NOT NULL,
+firstName varchar(255) NOT NULL,
+secondName varchar(255),
+lastName varchar(255),
+PRIMARY KEY (lCode)
+);
+
+CREATE TABLE myRegion
+(
+mid int NOT NULL AUTO_INCREMENT,
+uid varchar(255) NOT NULL,
+lCode int NOT NULL,
+PRIMARY KEY (mid)
+);
+
+CREATE TABLE users
+(
+uid varchar(255) NOT NULL,
+pwd varchar(255) NOT NULL,
+uname varchar(255) NOT NULL,
+email varchar(255),
+regDate date DEFAULT (CURRENT_DATE),
+isDeleted int DEFAULT 0,
+PRIMARY KEY (uid)
+);
+
+/* Create Foreign Keys */
+
+ALTER TABLE myRegion
+ADD FOREIGN KEY (lCode)
+REFERENCES locationCode (lCode)
+ON UPDATE RESTRICT
+ON DELETE RESTRICT
+;
+
+ALTER TABLE myRegion
+ADD FOREIGN KEY (uid)
+REFERENCES users (uid)
+ON UPDATE RESTRICT
+ON DELETE RESTRICT
+;
+
+CREATE TABLE locationCode
+(
+lCode int NOT NULL,
+firstName varchar(255) NOT NULL,
+secondName varchar(255),
+lastName varchar(255),
+PRIMARY KEY (lCode)
+);
+
+CREATE TABLE myRegion
+(
+mid int NOT NULL AUTO_INCREMENT,
+uid varchar(255) NOT NULL,
+lCode int NOT NULL,
+PRIMARY KEY (mid)
+);
+
+CREATE TABLE users
+(
+uid varchar(255) NOT NULL,
+pwd varchar(255) NOT NULL,
+uname varchar(255) NOT NULL,
+email varchar(255),
+regDate date DEFAULT (CURRENT_DATE),
+isDeleted int DEFAULT 0,
+PRIMARY KEY (uid)
+);
+
+/* Create Foreign Keys */
+
+ALTER TABLE myRegion
+ADD FOREIGN KEY (lCode)
+REFERENCES locationCode (lCode)
+ON UPDATE RESTRICT
+ON DELETE RESTRICT
+;
+
+ALTER TABLE myRegion
+ADD FOREIGN KEY (uid)
+REFERENCES users (uid)
+ON UPDATE RESTRICT
+ON DELETE RESTRICT
+;
+
+SET SESSION FOREIGN_KEY_CHECKS=0;
+
+/* Drop Tables */
+
+DROP TABLE IF EXISTS myRegion;
+DROP TABLE IF EXISTS locationCode;
+DROP TABLE IF EXISTS users;
+
+/* Create Tables */
+
+CREATE TABLE locationCode
+(
+lCode int NOT NULL,
+firstName varchar(255) NOT NULL,
+secondName varchar(255),
+lastName varchar(255),
+PRIMARY KEY (lCode)
+);
+
+CREATE TABLE myRegion
+(
+mid int NOT NULL AUTO_INCREMENT,
+uid varchar(255) NOT NULL,
+lCode int NOT NULL,
+PRIMARY KEY (mid)
+);
+
+CREATE TABLE users
+(
+uid varchar(255) NOT NULL,
+pwd varchar(255) NOT NULL,
+uname varchar(255) NOT NULL,
+email varchar(255),
+regDate date DEFAULT (CURRENT_DATE),
+isDeleted int DEFAULT 0,
+PRIMARY KEY (uid)
+);
+
+/* Create Foreign Keys */
+
+ALTER TABLE myRegion
+ADD FOREIGN KEY (lCode)
+REFERENCES locationCode (lCode)
+ON UPDATE RESTRICT
+ON DELETE RESTRICT
+;
+
+ALTER TABLE myRegion
+ADD FOREIGN KEY (uid)
+REFERENCES users (uid)
+ON UPDATE RESTRICT
+ON DELETE RESTRICT
+;
+
+CREATE TABLE locationCode
+(
+lCode int NOT NULL,
+firstName varchar(255) NOT NULL,
+secondName varchar(255),
+lastName varchar(255),
+PRIMARY KEY (lCode)
+);
+
+CREATE TABLE myRegion
+(
+mid int NOT NULL AUTO_INCREMENT,
+uid varchar(255) NOT NULL,
+lCode int NOT NULL,
+PRIMARY KEY (mid)
+);
+
+CREATE TABLE users
+(
+uid varchar(255) NOT NULL,
+pwd varchar(255) NOT NULL,
+uname varchar(255) NOT NULL,
+email varchar(255),
+regDate date DEFAULT (CURRENT_DATE),
+isDeleted int DEFAULT 0,
+PRIMARY KEY (uid)
+);
+
+/* Create Foreign Keys */
+
+ALTER TABLE myRegion
+ADD FOREIGN KEY (lCode)
+REFERENCES locationCode (lCode)
+ON UPDATE RESTRICT
+ON DELETE RESTRICT
+;
+
+ALTER TABLE myRegion
+ADD FOREIGN KEY (uid)
+REFERENCES users (uid)
+ON UPDATE RESTRICT
+ON DELETE RESTRICT
+;
