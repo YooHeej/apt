@@ -10,13 +10,13 @@ import java.util.List;
 public interface MyRegionDao {
 
     @Select("SELECT * FROM myRegion WHERE uid = #{uid}")
-    List<MyRegion> findByUserId(@Param("uid") String uid);
+    MyRegion findByUserId(@Param("uid") String uid);
 
     @Insert("INSERT INTO myRegion (uid, lCode) VALUES (#{uid}, #{lCode})")
     void insert(@Param("uid") String uid, @Param("lCode") int lCode);
 
     @Update("UPDATE myRegion SET lCode = #{lCode} WHERE mid = #{mid}")
-    void update(MyRegion myRegion);
+    void update(@Param("lCode") int lCode, @Param("mid") int mid);
 
     @Delete("DELETE FROM myRegion WHERE mid = #{mid}")
     void delete(@Param("mid") int mid);

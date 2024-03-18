@@ -2,7 +2,7 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
 	<header th:fragment="head">
-		<title>Apt</title>
+		<title>Apt Project</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -14,28 +14,8 @@
 			* { font-family: 'Noto Sans KR', sans-serif; }
 			a { text-decoration: none; }
 			.disabled-link { pointer-events: none; }
-
-			.container {
-				width: 1600px;
-				height: 900px;
-				text-align: center;
-				position: relative;
-				z-index: 1;
-			}
-			.container::after {
-				width: 1600px;
-				height: 900px;
-				content: "";
-				background: url("/apt/img/a.jpg");
-				position: absolute;
-				top: 0;
-				left: 0;
-				z-index: -1;
-				opacity: 0.4;
-			}
-
 		</style>
-		<script src="#"></script>
+		<script src="/apt/js/aside.js?v=3"></script>
 	</header>
 </head>
 <body>
@@ -62,7 +42,7 @@
 						</li>
 						<li class="nav-item ms-3">
 							<span th:if="${session.sessUid}">
-								<a class="nav-link" href="/apt/#"><i class="fas fa-sign-out-alt"></i> 로그아웃</a>
+								<a class="nav-link" href="/apt/user/logout"><i class="fas fa-sign-out-alt"></i> 로그아웃</a>
 							</span>
 							<span th:unless="${session.sessUid}">
 								<a class="nav-link" href="/apt/user/login"><i class="fas fa-sign-in-alt"></i> 로그인</a>
@@ -70,7 +50,7 @@
 						</li>
 						<li class="nav-item ms-3">
 							<span th:if="${session.sessUid}">
-								<span class="navbar-text me-3">[[${session.sessUname}]]님 환영합니다.</span>
+								<span class="navbar-text me-auto d-flex align-items-center mb-auto">[[${session.sessUname}]]님 환영합니다.</span>
 							</span>
 							<span th:unless="${session.sessUid}">
 								<a class="nav-link" href="/apt/user/register"><i class="fa-solid fa-circle-user"></i> 회원 가입</a>
@@ -81,8 +61,37 @@
 			</nav>
 		</header>
 	</div>
-	<div class="container">
+
+	<div class="container" style="margin-top:500px;">
+		<div class="row justify-content-end">
+			<div class="col-3 col-md-2 col-lg-2 text-end">
+				<aside th:fragment="aside">
+					
+					<div class="mt-2">
+						<span id="stateMsg">[[${session.stateMsg}]]</span>					
+						<a href="#" id="stateMsgBtn"><span class="badge bg-secondary">수정</span></a>
+					</div>
+					<div id="stateMsgInput" class="mt-2 d-none">
+						<input class="form-control form-control-sm" type="text" id="stateInput"
+							onkeyup="if(window.event.keyCode==13) {changeStateMsg()}">
+						<a href="#" id="stateMsgSubmit"><span class="badge bg-primary">확인</span></a>
+					</div>
+
+					<div class="mt-5">
+						<i class="fa fa-envelope me-2"></i>[[${session.email}]]<br>
+						<i class="fa-brands fa-github me-2"></i><a href="#">[[${session.github}]]</a><br>
+						<i class="fa-brands fa-instagram me-2"></i><a href="#">[[${session.insta}]]</a><br>
+						<i class="fa-solid fa-location-dot me-2"></i> [[${session.location}]]
+							<a href="#" id="getWeatherButton"><span class="badge bg-secondary">날씨</span></a><br>
+						<div id="weather"></div>	
+						<button class="btn btn-sm btn-outline-primary mt-3">Edit Profile</button>
+					</div>
+				</aside>
+			</div>
+
+		</div>
 	</div>
+	
 
 	<footer th:fragment="bottom">
 		<nav class="navbar navbar-expand-sm fixed-bottom" style="background-color:khaki" >

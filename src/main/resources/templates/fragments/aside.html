@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>위도 경도 표시 사이드바</title>
+    <!-- 카카오 맵 API 스크립트 -->
+    <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=08157067c1e3ca8a5ff4b9db6937c98f"></script>
+    <style>
+        /* 사이드바 스타일 */
+        .sidebar {
+            height: 100%;
+            width: 250px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: #f3f3f3;
+            padding-top: 20px;
+        }
+
+        /* 맵 컨테이너 스타일 */
+        #map {
+            height: 400px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <!-- 위도와 경도 표시 -->
+    <h2>위도 경도 정보</h2>
+    <p id="latitude">위도: </p>
+    <p id="longitude">경도: </p>
+</div>
+
+<div style="margin-left: 250px;">
+    <!-- 맵 표시 -->
+    <div id="map"></div>
+</div>
+
+<script>
+    // 맵 초기화 함수
+    function initMap() {
+        var container = document.getElementById('map');
+        var options = {
+            center: new kakao.maps.LatLng(37.5665, 126.9780), // 서울 시청 좌표
+            level: 10 // 지도 확대 수준
+        };
+        var map = new kakao.maps.Map(container, options);
+
+        // 위도와 경도 표시
+        document.getElementById('latitude').innerHTML += options.center.getLat();
+        document.getElementById('longitude').innerHTML += options.center.getLng();
+
+        // 마커 생성
+        var markerPosition = new kakao.maps.LatLng(options.center.getLat(), options.center.getLng());
+        var marker = new kakao.maps.Marker({
+            position: markerPosition
+        });
+        marker.setMap(map);
+    }
+</script>
+<script>
+    // 카카오 맵 API 로드
+    kakao.maps.load(initMap);
+</script>
+
+</body>
+</html>

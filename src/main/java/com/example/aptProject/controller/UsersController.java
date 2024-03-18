@@ -36,12 +36,14 @@ public class UsersController {
 		return "user/register";
 	}
 
+
 	@GetMapping("/register/secondNames")
 	@ResponseBody
 	public List<String> getSecondNamesByFirstName(@RequestParam("firstName") String firstName) {
 		List<String> secondNames = locationCodeService.getSecondNamesByFirstName(firstName);
 		return secondNames;
 	}
+
 
 	@PostMapping("/register")
 	public String registerProc(Model model,
@@ -53,18 +55,12 @@ public class UsersController {
 			return "common/alertMsg";
 		}
 		if (pwd.equals(pwd2) && pwd != null) {
-			System.out.println("1111111111111111111111111111111111");
 			Users user = new Users(uid, pwd, uname, email);
-			System.out.println("22222222222222222222222222222");
 			uSvc.registerUser(user);
-			System.out.println("33333333333333333333333333");
 			mSvc.registerUser(user, firstName, secondName);
-			System.out.println("4444444444444444444444444444");
 
 			model.addAttribute("msg", "등록을 마쳤습니다. 로그인하세요.");
-			System.out.println("5555555555555555555555555555555");
 			model.addAttribute("url", "/apt/user/login");
-			System.out.println("6666666666666666666666666666666");
 			return "common/alertMsg";
 		} else {
 			model.addAttribute("msg", "패스워드 입력이 잘못되었습니다.");
@@ -117,6 +113,8 @@ public class UsersController {
 	public String updateForm(HttpSession session, Model model) {
 		String sessUid = (String) session.getAttribute("sessUid");
 		if (sessUid != null) {
+			List<String> firstNames = locationCodeService.getAllFirstNames();
+			model.addAttribute("firstNames", firstNames);
 			Users user = uSvc.getUserByUid(sessUid);
 			model.addAttribute("user", user);
 		} else {
@@ -126,12 +124,21 @@ public class UsersController {
 
 		return "user/update";
 	}
+	@GetMapping("/update/secondNames")
+	@ResponseBody
+	public List<String> getSecondNamesByFirstNameForUpdate(@RequestParam("firstName") String firstName) {
+		List<String> secondNames = locationCodeService.getSecondNamesByFirstName(firstName);
+		return secondNames;
+	}
+
+
 	@PostMapping("/update")
-	public String updateProc(Users user, HttpSession session, Model model) {
+	public String updateProc(Users user, HttpSession session, Model model, String firstName, String secondName) {
 		String sessUid = (String) session.getAttribute("sessUid");
 
 		if (sessUid != null && sessUid.equals(user.getUid())) {
 			uSvc.updateUser(user);
+			mSvc.updateUser(user, firstName, secondName);
 
 			model.addAttribute("msg", "회원 정보가 업데이트되었습니다.");
 			model.addAttribute("url", "/apt/user/update");
