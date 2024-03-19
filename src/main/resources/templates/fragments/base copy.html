@@ -66,8 +66,16 @@
 		<div class="row justify-content-end">
 			<div class="col-3 col-md-2 col-lg-2 text-end">
 				<aside th:fragment="aside">
-					
-					
+					<h5>위도, 경도, 위치정보</h5>
+					<ul>
+						<!-- positions 배열에 있는 위치 정보를 반복하여 표시합니다 -->
+						<li th:each="position : ${positions}">
+							<!-- 해당 위치의 위도와 경도를 출력합니다 -->
+							<span th:text="${position.latlng.getLat()} + ', ' + ${position.latlng.getLng()}"></span>
+							<!-- 만약 위치 정보가 있다면, 해당 내용을 출력합니다 -->
+							<span th:if="${position.content}"> - <span th:text="${position.content}"></span></span>
+						</li>
+					</ul>
 				</aside>
 			</div>
 
