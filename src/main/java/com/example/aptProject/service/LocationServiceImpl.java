@@ -33,6 +33,26 @@ public class LocationServiceImpl implements LocationService {
     public LocationCode getLocationCodeByFirstNameAndSecondName(String firstName, String secondName) {
         return locationCodeDao.getLocationCodeByFirstNameAndSecondName(firstName, secondName);
     }
+
+    @Override
+    public LocationCode getLocationCodeByFirstNameAndSecondNameAndLastName(String firstName, String secondName, String lastName) {
+        return locationCodeDao.getLocationCodeByFirstNameAndSecondNameAndLastName(firstName, secondName, lastName);
+    }
+
+    @Override
+    public List<String> getLastNamesByFirstNameAndSecondName(String firstName, String secondName) {
+        List<String> list = locationCodeDao.findLastNamesByFirstNameAndSecondName(firstName, secondName);
+        list.removeIf(item -> item == null);
+        Collections.sort(list);
+
+        return list;
+    }
+
+    @Override
+    public LocationCode getLocationCodeByLcode(int lCode) {
+        return locationCodeDao.getLocationCode(lCode);
+    }
+
     @Override
     public String getLocationName(int lCode) {
         String firstName, secondName, lastName = "";

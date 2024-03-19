@@ -1,5 +1,6 @@
 package com.example.aptProject.controller;
 
+import com.example.aptProject.entity.MyRegion;
 import com.example.aptProject.entity.Users;
 import com.example.aptProject.service.LocationService;
 import com.example.aptProject.service.MyRegionService;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 
 @Controller
@@ -28,6 +30,9 @@ public class UsersController {
 	private UsersService uSvc;
 	@Autowired
 	private MyRegionService mSvc;
+	@Autowired
+	private LocationService lSvc;
+
 
 	@GetMapping("/register")
 	public String registerForm(Model model) {
@@ -47,7 +52,7 @@ public class UsersController {
 
 	@PostMapping("/register")
 	public String registerProc(Model model,
-							   String uid, String pwd, String pwd2, String uname, String email, String firstName, String secondName) {
+							   String uid, String pwd, String pwd2, String uname, String email, String firstName, String secondName, String lastName) {
 
 		if (uSvc.getUserByUid(uid) != null) {
 			model.addAttribute("msg", "사용자 ID가 중복되었습니다.");
@@ -57,7 +62,12 @@ public class UsersController {
 		if (pwd.equals(pwd2) && pwd != null) {
 			Users user = new Users(uid, pwd, uname, email);
 			uSvc.registerUser(user);
-			mSvc.registerUser(user, firstName, secondName);
+
+			if(lastName.equals("")){
+				mSvc.registerUserBy2Names(user, firstName, secondName);
+			}else{
+				mSvc.registerUserBy3Names(user, firstName, secondName, lastName);
+			}
 
 			model.addAttribute("msg", "등록을 마쳤습니다. 로그인하세요.");
 			model.addAttribute("url", "/apt/user/login");
@@ -87,9 +97,16 @@ public class UsersController {
 
 			// 환영 메세지
 			log.info("Info Login: {}, {}", uid, user.getUname());
+			int LAWD_CD = 0;
+			String DEAL_YMD = LocalDate.now().getYear() + String.format("%02d", LocalDate.now().getMonthValue() - 1);
+			MyRegion myRegion = mSvc.getMyRegionByUid(uid);
+			LAWD_CD = myRegion.getlCode();
+			String url = "/apt/api/getResult/" + LAWD_CD + "/1";
+
 			model.addAttribute("msg", user.getUname()+"님 환영합니다.");
-			model.addAttribute("url", "/apt/map");
-			break;
+			model.addAttribute("url", url);
+//			model.addAttribute("url", "/apt/api/map");
+				break;
 
 		case UsersService.USER_NOT_EXIST:
 			model.addAttribute("msg", "ID가 없습니다. 회원가입 페이지로 이동합니다.");
@@ -101,6 +118,13 @@ public class UsersController {
 			model.addAttribute("url", "/apt/user/login");
 		}
 		return "common/alertMsg";
+	}
+
+	@GetMapping("/register/lastNames")
+	@ResponseBody
+	public List<String> getLastNamesByFirstNameAndSecondName(@RequestParam("firstName") String firstName,@RequestParam("secondName") String secondName) {
+		List<String> lastNames = locationCodeService.getLastNamesByFirstNameAndSecondName(firstName, secondName);
+		return lastNames;
 	}
 
 	@GetMapping("/logout")

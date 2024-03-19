@@ -16,11 +16,17 @@ public interface LocationCodeDao {
     List<String> findAllFirstNames();
 
     // 선택된 firstName에 따른 secondName 목록을 불러옵니다.
-    @Select("SELECT secondName FROM locationCode WHERE firstName = #{firstName}")
+    @Select("SELECT distinct secondName FROM locationCode WHERE firstName = #{firstName}")
     List<String> findSecondNamesByFirstName(@Param("firstName") String firstName);
+
+    @Select("SELECT distinct lastName FROM locationCode WHERE firstName = #{firstName} AND secondName = #{secondName}")
+    List<String> findLastNamesByFirstNameAndSecondName(@Param("firstName") String firstName, @Param("secondName") String secondName);
 
     @Select("SELECT lCode FROM LocationCode WHERE firstName = #{firstName} AND secondName = #{secondName}")
     LocationCode getLocationCodeByFirstNameAndSecondName(@Param("firstName") String firstName, @Param("secondName") String secondName);
+
+    @Select("SELECT lCode FROM LocationCode WHERE firstName = #{firstName} AND secondName = #{secondName} AND lastName = #{lastName}")
+    LocationCode getLocationCodeByFirstNameAndSecondNameAndLastName(@Param("firstName") String firstName, @Param("secondName") String secondName, @Param("lastName") String lastName);
 
 
 }

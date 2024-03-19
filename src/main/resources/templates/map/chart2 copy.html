@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+	<title>Document</title>
+</head>
+
+<body>
+	<canvas id="mixed-chart" width="800" height="450"></canvas>
+	<script>
+		const config= {
+			type: 'scatter',
+			data: {
+				datasets: [{
+					label: 'Scatt',
+					data: [{
+					x: 5,
+					y: 10
+			}, {
+					x:15,
+					y:-10
+			}, {
+				x:-10,
+				y: 20
+			}],
+			backgroundColor: 'rgba(255, 99, 132, 0.6)'
+		}]
+	},
+			option: {
+				scales: {
+					x: {
+						beginAtZero: true
+					},
+						y: {
+							beginAtZero: true
+					}
+				}
+			}
+		}
+	</script>	
+</body>
+</html>

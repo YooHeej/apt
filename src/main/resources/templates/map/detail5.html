@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <header th:replace="~{fragments/base :: head}"></header>
+</head>
+
+<body>
+<div th:insert="~{fragments/base :: top}"></div>
+<div id="map" style="margin-top: 102px;width: 100%;height:350px;"></div>
+<script type="text/javascript" src="http://dapi.kakao.com/v2/maps/sdk.js?appkey=2d2a3af9bbb84f916054050b2f654eae&libraries=services,clusterer"></script>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var mapContainer = document.getElementById('map'),  // 지도를 표시할 div 
+        mapOption = {
+            center: new kakao.maps.LatLng([[${session.centerLat}]],[[${session.centerLon}]]),// 지도의 중심좌표
+            level: 7,          // 지도의 확대 레벨
+            mapTypeId : kakao.maps.MapTypeId.HYBRID     // 지도종류
+        };
+    // 지도를 생성한다 
+    var map = new kakao.maps.Map(mapContainer, mapOption);
+
+    // 지도 타입 변경 컨트롤을 생성한다
+	var mapTypeControl = new kakao.maps.MapTypeControl();
+
+    // 지도의 상단 우측에 지도 타입 변경 컨트롤을 추가한다
+	map.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);	
+
+    // 지도에 확대 축소 컨트롤을 생성한다
+    var zoomControl = new kakao.maps.ZoomControl();
+
+    // 지도의 우측에 확대 축소 컨트롤을 추가한다
+    map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
+
+    // 주소-좌표 변환 객체를 생성합니다
+    var geocoder = new kakao.maps.services.Geocoder();
+
+    // 클릭한 위치를 표시할 마커입니다
+    var marker = new kakao.maps.Marker(),
+        infowindow = new kakao.maps.InfoWindow({zindex:1}); // 클릭한 위치에 대한 주소를 표시할 인포윈도우입니다
+
+    function searchDetailAddrFromCoords(coords, callback) {
+        // 좌표로 법정동 상세 주소 정보를 요청합니다
+        geocoder.coord2Address(coords.getLng(), coords.getLat(), callback);
+    }
+
+    // 지도 좌측상단에 지도 중심좌표에 대한 주소정보를 표출하는 함수입니다
+    function displayCenterInfo(result, status) {
+        if (status === kakao.maps.services.Status.OK) {
+            var infoDiv = document.getElementById('centerAddr');
+            for(var i = 0; i < result.length; i++) {
+                if (result[i].region_type === 'H') {
+                    console.log(result[i]);
+                    infoDiv.innerText = result[i].address_name;
+                    break;
+                }
+            }
+        }
+    }
+
+    // 리스트를 받아올 객체 배열입니다
+    var resultList = /*[[${resultList}]]*/ [];
+    // 마커를 표시할 위치와 title 객체 배열입니다
+    var positions = [];
+
+    resultList.forEach(function(result) {
+        var latlng = new kakao.maps.LatLng(result.lat, result.lon); // 위도와 경도 정보를 이용하여 LatLng 객체를 생성합니다.
+        // positions 배열에 위도, 경도, 내용을 저장합니다.
+        positions.push({
+            latlng: latlng,     // LatLng 객체
+            content: result.firstName       // 마커에 표시할 내용 (예시로 name 속성 사용)
+        });
+    });
+
+    // 마커 이미지의 이미지 주소입니다
+    var imageSrc = "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png";
+    // 마커 이미지의 이미지 크기 입니다
+    var imageSize = new kakao.maps.Size(24, 35);
+    // 마커 이미지를 생성합니다
+    var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize);
+    
+    positions.forEach(function(position) {
+        var marker = new kakao.maps.Marker({
+            map: map,   // 마커를 표시할 지도
+            position: position.latlng,      // 마커를 표시할 위치
+            title: position.content,        // 마커의 타이틀, 마커에 마우스를 올리면 타이틀이 표시됩니다
+            image: markerImage              // 마커 이미지 
+        });
+        // 마커에 클릭 이벤트를 등록한다 (우클릭 : rightclick)
+        kakao.maps.event.addListener(marker, 'click', function() {
+            alert('ㅖㅏ');
+        });
+    });
+
+    /*]]>*/
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const firstNameSelect = document.getElementById('firstNameSelect');
+        const secondNameSelect = document.getElementById('secondNameSelect');
+        const lastNameSelect = document.getElementById('lastNameSelect');
+
+        // firstName 선택 시 이벤트 리스너 추가
+        firstNameSelect.addEventListener('change', function() {
+            const selectedFirstName = this.value;
+
+            // secondNameSelect와 lastNameSelect 드롭다운 초기화
+            secondNameSelect.innerHTML = '<option value="">시/군을 선택해주세요</option>';
+            secondNameSelect.disabled = true; // 선택할 때까지 비활성화
+            secondNameSelect.style.display = ''; // 화면에 표시
+
+            lastNameSelect.innerHTML = '<option value="">-</option>';
+            lastNameSelect.disabled = true; // 선택할 때까지 비활성화
+            lastNameSelect.style.display = ''; // 화면에 표시
+
+            // 선택된 firstName이 있는 경우에만 AJAX 요청 실행
+            if(selectedFirstName) {
+                fetch(`/apt/api/search/secondNames?firstName=${encodeURIComponent(selectedFirstName)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // 응답으로 받은 secondName 목록을 secondNameSelect에 채움
+                        data.forEach(secondName => {
+                            const optionElement = document.createElement('option');
+                            optionElement.value = secondName;
+                            optionElement.text = secondName;
+                            secondNameSelect.appendChild(optionElement);
+                        });
+                        secondNameSelect.disabled = false; // 활성화
+                    })
+                    .catch(error => console.error('Error fetching second names:', error));
+            }
+        });
+
+        // secondName 선택 시 이벤트 리스너 추가
+        secondNameSelect.addEventListener('change', function() {
+            const selectedSecondName = this.value;
+
+            // lastNameSelect 드롭다운 초기화
+            lastNameSelect.innerHTML = '<option value="">구를 선택해주세요 &nbsp;&nbsp; &nbsp;</option>';
+            lastNameSelect.disabled = true; // 선택할 때까지 비활성화
+
+            // 선택된 secondName이 있는 경우에만 AJAX 요청 실행
+            if(selectedSecondName) {
+                fetch(`/apt/api/search/lastNames?firstName=${encodeURIComponent(firstNameSelect.value)}&secondName=${encodeURIComponent(selectedSecondName)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // 응답으로 받은 lastName 목록을 lastNameSelect에 채움
+                        data.forEach(lastName => {
+                            const optionElement = document.createElement('option');
+                            optionElement.value = lastName;
+                            optionElement.text = lastName;
+                            lastNameSelect.appendChild(optionElement);
+                        });
+                        lastNameSelect.disabled = false; // 활성화
+                    })
+                    .catch(error => console.error('Error fetching last names:', error));
+            }
+        });
+    });
+</script>
+<form action="/apt/api/search" method="post" enctype="multipart/form-data">
+    <table class="table table-borderless">
+    <tr>
+        <td><label class="col-form-label">검색</label></td>
+        <td>
+            <select id="firstNameSelect" name="firstName">
+                <option value="">시/도를 선택해주세요</option>
+                <th:block th:each="firstName : ${firstNames}">
+                    <option th:value="${firstName}" th:text="${firstName}"></option>
+                </th:block>
+            </select><br>
+            <select class="mt-1" id="secondNameSelect" name="secondName" disabled>
+                <option value="">-</option>
+            </select><br>
+            <select class="mt-1" id="lastNameSelect" name="lastName" disabled>
+                <option value="">-</option>
+            </select>
+            <select class="mt-1" id="periodSelect" name="period">
+                <option value="1" selected>1개월</option>
+                <option value="3">3개월</option>
+                <option value="6">6개월</option>
+                <option value="12">12개월</option>
+            </select>
+            <button class="btn btn-primary" type="submit">확인</button>
+        </td>
+
+    </tr>
+    </table>
+</form>
+<footer th:replace="~{fragments/base :: bottom}"></footer>
+</body>
+</html>

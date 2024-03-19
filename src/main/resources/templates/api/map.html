@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <header th:replace="~{fragments/base :: head}"></header>
+    <style>
+        td, th { text-align: center; }
+    </style>
+    <script th:inline="javascript">
+        function likeClick(bid) {
+            let oldCount = $('#likeCount').text();
+            // console.log("oldCount=" + oldCount);
+            $.ajax({
+                type: 'GET',
+                url: '/abbs/board/like/' + bid,
+                success: function(count) {				// count = <span id="likeCount">2</span>
+                    $('#likeCount').replaceWith(count);
+                    // console.log("count=" + count);
+                    let newCount = $('#likeCount').text();
+                    if (oldCount > newCount)
+                        $('#likeIcon').attr({'class': 'fa-regular fa-thumbs-up'}); 	// 좋아요 취소
+                    else
+                        $('#likeIcon').attr({'class': 'fa-solid fa-thumbs-up'});		// 좋아요 누름
+                }
+            });
+        }
+        function deleteBoard() {
+            $('#deleteModal').modal('show');
+        }
+    </script>
+</head>
+<body>
+<div th:insert="~{fragments/base :: top}"></div>
+</body>
+</html>

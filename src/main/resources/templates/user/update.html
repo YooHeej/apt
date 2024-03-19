@@ -9,14 +9,20 @@
         document.addEventListener('DOMContentLoaded', function() {
             const firstNameSelect = document.getElementById('firstNameSelect');
             const secondNameSelect = document.getElementById('secondNameSelect');
+            const lastNameSelect = document.getElementById('lastNameSelect');
 
             // firstName 선택 시 이벤트 리스너 추가
             firstNameSelect.addEventListener('change', function() {
                 const selectedFirstName = this.value;
 
-                // secondNameSelect 드롭다운 초기화
-                secondNameSelect.innerHTML = '<option value="">구/군을 선택해주세요</option>';
+                // secondNameSelect와 lastNameSelect 드롭다운 초기화
+                secondNameSelect.innerHTML = '<option value="">시/군을 선택해주세요</option>';
                 secondNameSelect.disabled = true; // 선택할 때까지 비활성화
+                secondNameSelect.style.display = ''; // 화면에 표시
+
+                lastNameSelect.innerHTML = '<option value="">-</option>';
+                lastNameSelect.disabled = true; // 선택할 때까지 비활성화
+                lastNameSelect.style.display = ''; // 화면에 표시
 
                 // 선택된 firstName이 있는 경우에만 AJAX 요청 실행
                 if(selectedFirstName) {
@@ -33,6 +39,32 @@
                             secondNameSelect.disabled = false; // 활성화
                         })
                         .catch(error => console.error('Error fetching second names:', error));
+                }
+            });
+
+            // secondName 선택 시 이벤트 리스너 추가
+            secondNameSelect.addEventListener('change', function() {
+                const selectedSecondName = this.value;
+
+                // lastNameSelect 드롭다운 초기화
+                lastNameSelect.innerHTML = '<option value="">구를 선택해주세요 &nbsp;&nbsp; &nbsp;</option>';
+                lastNameSelect.disabled = true; // 선택할 때까지 비활성화
+
+                // 선택된 secondName이 있는 경우에만 AJAX 요청 실행
+                if(selectedSecondName) {
+                    fetch(`/apt/user/register/lastNames?firstName=${encodeURIComponent(firstNameSelect.value)}&secondName=${encodeURIComponent(selectedSecondName)}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            // 응답으로 받은 lastName 목록을 lastNameSelect에 채움
+                            data.forEach(lastName => {
+                                const optionElement = document.createElement('option');
+                                optionElement.value = lastName;
+                                optionElement.text = lastName;
+                                lastNameSelect.appendChild(optionElement);
+                            });
+                            lastNameSelect.disabled = false; // 활성화
+                        })
+                        .catch(error => console.error('Error fetching last names:', error));
                 }
             });
         });
@@ -79,8 +111,11 @@
                                         <th:block th:each="firstName : ${firstNames}">
                                             <option th:value="${firstName}" th:text="${firstName}"></option>
                                         </th:block>
-                                    </select>
-                                    <select id="secondNameSelect" name="secondName" disabled>
+                                    </select><br>
+                                    <select class="mt-1" id="secondNameSelect" name="secondName" disabled>
+                                        <option value="">-</option>
+                                    </select><br>
+                                    <select class="mt-1" id="lastNameSelect" name="lastName" disabled>
                                         <option value="">-</option>
                                     </select>
                                 </td>

@@ -1,6 +1,7 @@
 package com.example.aptProject.service;
 
 import com.example.aptProject.entity.APIResult;
+import com.example.aptProject.entity.APIResultIncludeTotalCount;
 import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
@@ -8,9 +9,14 @@ import java.util.List;
 import java.util.Map;
 
 public interface ApiService {
+    /**
+     *
+     * 쥰내바꿈 여기도 ㅇㅇ 기준
+     */
     StringBuilder getAPIResult(String serviceKey, String pageNo, String numOfRows, String LAWD_CD, String DEAL_YMD) throws IOException ;
-    List<APIResult> getResultList(String numOfRows, String LAWD_CD, String DEAL_YMD) throws IOException;
+    APIResultIncludeTotalCount getResultList(String numOfRows, String LAWD_CD, String period) throws IOException;
     Map<String, Double> getGeoCode(String addr) throws IOException, ParseException;
-    String getTotalCount(String LAWD_CD, String DEAL_YMD) throws IOException;
+    Map<String, Double> getCenterGeoCode(List<APIResult> apiResults) throws IOException, ParseException;
+    String getTotalCount(String LAWD_CD, String period) throws IOException;
 
 }

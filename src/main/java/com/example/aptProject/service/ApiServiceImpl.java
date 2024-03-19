@@ -2,6 +2,7 @@ package com.example.aptProject.service;
 
 import com.example.aptProject.entity.APIResult;
 
+import com.example.aptProject.entity.APIResultIncludeTotalCount;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -19,6 +20,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -59,79 +61,95 @@ public class ApiServiceImpl implements ApiService{
     }
 
     @Override
-    public List<APIResult> getResultList(String numOfRows, String LAWD_CD, String DEAL_YMD) throws IOException {
+    public APIResultIncludeTotalCount getResultList(String numOfRows, String LAWD_CD, String period) throws IOException {
         String serviceKey = "rlpbGR9EbYg8iu0YftsAGmUeblmq9qJenXIk7WsVg0qr%2FRXALrab9zfstv0OkO5A15gR4aKR5aO%2FVFtjV6dkfA%3D%3D";
         String pageNo = "1";
+        String DEAL_YMD = LocalDate.now().getYear() + String.format("%02d", LocalDate.now().getMonthValue() - 1);
 
-        StringBuilder sb = getAPIResult(serviceKey, pageNo, numOfRows, LAWD_CD, DEAL_YMD);
 
         APIResult apiResult = null;
         List<APIResult> resultList = new ArrayList<>();
-
-        try {
-            // XML 문자열
-            String xmlString = sb.toString();
-
-            // XML 파서 생성
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            InputStream inputStream = new ByteArrayInputStream(xmlString.getBytes());
-
-            // XML 파싱
-            Document doc = builder.parse(inputStream);
-            doc.getDocumentElement().normalize();
-
-            Node totalCountNode = doc.getElementsByTagName("totalCount").item(0);
-            String totalCount = totalCountNode.getTextContent().trim();
-
-            // 각 항목 추출
-            NodeList itemList = doc.getElementsByTagName("item");
-            for (int i = 0; i < itemList.getLength(); i++) {
-                Node itemNode = itemList.item(i);
-                if (itemNode.getNodeType() == Node.ELEMENT_NODE) {
-                    Element itemElement = (Element) itemNode;
-                    String 거래금액 = itemElement.getElementsByTagName("거래금액").item(0).getTextContent().trim();
-                    String 건축년도 = itemElement.getElementsByTagName("건축년도").item(0).getTextContent().trim();
-                    String 년 = itemElement.getElementsByTagName("년").item(0).getTextContent().trim();
-                    String 도로명 = itemElement.getElementsByTagName("도로명").item(0).getTextContent().trim();
-                    String 법정동 = itemElement.getElementsByTagName("법정동").item(0).getTextContent().trim();
-                    String 아파트 = itemElement.getElementsByTagName("아파트").item(0).getTextContent().trim();
-                    String 월 = itemElement.getElementsByTagName("월").item(0).getTextContent().trim();
-                    String 일 = itemElement.getElementsByTagName("일").item(0).getTextContent().trim();
-                    String 전용면적 = itemElement.getElementsByTagName("전용면적").item(0).getTextContent().trim();
-                    String 지역코드 = itemElement.getElementsByTagName("지역코드").item(0).getTextContent().trim();
-                    String 층 = itemElement.getElementsByTagName("층").item(0).getTextContent().trim();
-
-                    String addr = "";
-                    addr = lSvc.getLocationName(Integer.parseInt(지역코드)) + " " + 도로명;
-                    Map<String, Double> map = getGeoCode(addr);
-
-                    apiResult = new APIResult(년, 월, 일, 지역코드, 법정동, 도로명, 아파트, 층, 전용면적, 건축년도, 거래금액, totalCount, map.get("lon"), map.get("lat"));
-
-                    System.out.println("년: " + 년);
-                    System.out.println("월: " + 월);
-                    System.out.println("일: " + 일);
-                    System.out.println("지역코드: " + 지역코드);
-                    System.out.println("법정동: " + 법정동);
-                    System.out.println("도로명: " + 도로명);
-                    System.out.println("아파트: " + 아파트);
-                    System.out.println("층: " + 층);
-                    System.out.println("전용면적(m^2): " + 전용면적);
-                    System.out.println("건축년도: " + 건축년도);
-                    System.out.println("거래금액(만): " + 거래금액);
-                    System.out.println("totalCount: " + totalCount);
-                    System.out.println("lat: " + map.get("lat"));
-                    System.out.println("lon: " + map.get("lon"));
-                    System.out.println("---");
-                }
-                resultList.add(apiResult);
-
+        int count = 0;
+        String totalCount ="";
+        for(int k = 0; k<Integer.parseInt(period); k++){
+            int year = LocalDate.now().getYear(); // 현재 연도
+            int month = LocalDate.now().getMonthValue() - 1; // 현재 월
+            if (month - k <= 0) {
+                year -= 1; // 연도 조정
+                month = 12 - (k - month); // 월 조정
+            } else {
+                month -= k;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
-        return resultList;
+            DEAL_YMD = year + String.format("%02d", month);
+            StringBuilder sb = getAPIResult(serviceKey, pageNo, numOfRows, LAWD_CD, DEAL_YMD);
+            try {
+                // XML 문자열
+                String xmlString = sb.toString();
+
+                // XML 파서 생성
+                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder builder = factory.newDocumentBuilder();
+                InputStream inputStream = new ByteArrayInputStream(xmlString.getBytes());
+
+                // XML 파싱
+                Document doc = builder.parse(inputStream);
+                doc.getDocumentElement().normalize();
+
+                Node totalCountNode = doc.getElementsByTagName("totalCount").item(0);
+                count += Integer.parseInt(totalCountNode.getTextContent().trim());
+
+                // 각 항목 추출
+                NodeList itemList = doc.getElementsByTagName("item");
+                for (int i = 0; i < itemList.getLength(); i++) {
+                    Node itemNode = itemList.item(i);
+                    if (itemNode.getNodeType() == Node.ELEMENT_NODE) {
+                        Element itemElement = (Element) itemNode;
+                        String 거래금액 = itemElement.getElementsByTagName("거래금액").item(0).getTextContent().trim();
+                        String 건축년도 = itemElement.getElementsByTagName("건축년도").item(0).getTextContent().trim();
+                        String 년 = itemElement.getElementsByTagName("년").item(0).getTextContent().trim();
+                        String 도로명 = itemElement.getElementsByTagName("도로명").item(0).getTextContent().trim();
+                        String 법정동 = itemElement.getElementsByTagName("법정동").item(0).getTextContent().trim();
+                        String 아파트 = itemElement.getElementsByTagName("아파트").item(0).getTextContent().trim();
+                        String 월 = itemElement.getElementsByTagName("월").item(0).getTextContent().trim();
+                        String 일 = itemElement.getElementsByTagName("일").item(0).getTextContent().trim();
+                        String 전용면적 = itemElement.getElementsByTagName("전용면적").item(0).getTextContent().trim();
+                        String 지역코드 = itemElement.getElementsByTagName("지역코드").item(0).getTextContent().trim();
+                        String 층 = itemElement.getElementsByTagName("층").item(0).getTextContent().trim();
+
+                        String addr = "";
+                        addr = lSvc.getLocationName(Integer.parseInt(지역코드)) + " " + 도로명;
+                        Map<String, Double> map = getGeoCode(addr);
+
+                        apiResult = new APIResult(년, 월, 일, 지역코드, 법정동, 도로명, 아파트, 층, 전용면적, 건축년도, 거래금액, totalCount, map.get("lon"), map.get("lat"));
+
+                        System.out.println("년: " + 년);
+                        System.out.println("월: " + 월);
+                        System.out.println("일: " + 일);
+                        System.out.println("지역코드: " + 지역코드);
+                        System.out.println("법정동: " + 법정동);
+                        System.out.println("도로명: " + 도로명);
+                        System.out.println("아파트: " + 아파트);
+                        System.out.println("층: " + 층);
+                        System.out.println("전용면적(m^2): " + 전용면적);
+                        System.out.println("건축년도: " + 건축년도);
+                        System.out.println("거래금액(만): " + 거래금액);
+                        System.out.println("lat: " + map.get("lat"));
+                        System.out.println("lon: " + map.get("lon"));
+                        System.out.println("---");
+                    }
+                    resultList.add(apiResult);
+
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+        totalCount = String.valueOf(count);
+        APIResultIncludeTotalCount result = new APIResultIncludeTotalCount(resultList, totalCount);
+
+        return result;
 
     }
 
@@ -179,10 +197,28 @@ public class ApiServiceImpl implements ApiService{
     }
 
     @Override
-    public String getTotalCount(String LAWD_CD, String DEAL_YMD) throws IOException {
-        List<APIResult> list = getResultList("1", LAWD_CD, DEAL_YMD);
-        System.out.println("요기서는 이렇게나옴 " + list.get(0).getTotalCount());
-        return list.get(0).getTotalCount();
+    public Map<String, Double> getCenterGeoCode(List<APIResult> apiResults) throws IOException, ParseException {
+        Map<String, Double> centerGeoCode = new HashMap<>();
+
+        double lonSum = 0.0;
+        double latSum = 0.0;
+        for (APIResult result : apiResults) {
+            lonSum += result.getLon();
+            latSum += result.getLat();
+        }
+
+        double lonAverage = lonSum / apiResults.size();
+        double latAverage = latSum / apiResults.size();
+
+        centerGeoCode.put("lon", lonAverage);
+        centerGeoCode.put("lat", latAverage);
+
+        return centerGeoCode;
+    }
+
+    @Override
+    public String getTotalCount(String LAWD_CD, String period) throws IOException {
+        return getResultList("1", LAWD_CD, period).getTotalCount();
     }
 
     //법정동 코드.txt파일 데이터 전처리 하고 insert 쿼리문으로 변경해주는 코드

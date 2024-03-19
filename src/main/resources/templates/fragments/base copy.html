@@ -68,7 +68,7 @@
 				<aside th:fragment="aside">
 					
 					<div class="mt-2">
-						<span id="stateMsg">[[${session.stateMsg}]]</span>					
+						<span id="lCode"><div [session.lCode]=""></div></span>					
 						<a href="#" id="stateMsgBtn"><span class="badge bg-secondary">수정</span></a>
 					</div>
 					<div id="stateMsgInput" class="mt-2 d-none">
@@ -78,8 +78,8 @@
 					</div>
 
 					<div class="mt-5">
-						<i class="fa fa-envelope me-2"></i>[[${session.email}]]<br>
-						<i class="fa-brands fa-github me-2"></i><a href="#">[[${session.github}]]</a><br>
+						<i class="fa fa-아파트 me-2"></i>[[${session.아파트}]]<br>
+						<i class="fa-brands fa-거래금액 me-2"></i><a href="#">[[${session.거래금액}]]</a><br>
 						<i class="fa-brands fa-instagram me-2"></i><a href="#">[[${session.insta}]]</a><br>
 						<i class="fa-solid fa-location-dot me-2"></i> [[${session.location}]]
 							<a href="#" id="getWeatherButton"><span class="badge bg-secondary">날씨</span></a><br>

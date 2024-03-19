@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scatter</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.2.2/css/bootstrap.min.css">
+</head>
+<body>
+
+<div class="row justify-content-center mt-4">
+    <div class="col-9">
+        <div class="card">
+            <div class="card-body d-flex justify-content-center">
+                <canvas id="myChart" style="width: 400px; height: 400px;"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.1.1/chart.min.js"></script>
+<script>
+    /*데이터*/
+    const scatter_data = [
+        {x : 5, y:1},
+        {x : 3, y:5},
+        {x : 7, y:3},
+        {x : 2, y:7},
+        {x : 9, y:9},
+        {x : 10, y:2},
+        {x : 8, y:9},
+        {x : 1, y:1},
+        {x : 3, y:2},
+    ];
+
+    const scatter_data2 = [
+        {x : 9, y:7},
+        {x : 5, y:2},
+        {x : 1, y:6},
+        {x : 8, y:3},
+        {x : 2, y:4},
+        {x : 1, y:8},
+        {x : 4, y:3},
+        {x : 8, y:6},
+        {x : 6, y:4},
+    ];
+
+    /* create chart*/
+    const ctx = document.getElementById('myChart').getContext('2d');
+    const myChart = new Chart(ctx, {
+        type: 'scatter',
+        data: {
+            datasets: [
+                {
+                    label: 'Dataset 1',
+                    data: scatter_data,
+                    backgroundColor: 'rgb(255, 99, 132)',
+                },
+                {
+                    label: 'Dataset 2',
+                    data: scatter_data2,
+                    backgroundColor: 'rgb(99, 255, 132)',
+                }
+            ]
+        },
+        options:  {
+            elements: {
+                point:  {
+                    radius: 10,
+                }
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

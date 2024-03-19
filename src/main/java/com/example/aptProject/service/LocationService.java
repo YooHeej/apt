@@ -9,4 +9,8 @@ public interface LocationService {
     List<String> getAllFirstNames();
     List<String> getSecondNamesByFirstName(String firstName);
     LocationCode getLocationCodeByFirstNameAndSecondName(String firstName, String secondName);
+    LocationCode getLocationCodeByFirstNameAndSecondNameAndLastName(String firstName, String secondName, String lastName);
+    List<String> getLastNamesByFirstNameAndSecondName(String firstName, String secondName);
+    LocationCode getLocationCodeByLcode(int lCode);
+
 }

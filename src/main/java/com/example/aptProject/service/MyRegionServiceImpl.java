@@ -12,8 +12,14 @@ public class MyRegionServiceImpl implements MyRegionService{
     @Autowired private MyRegionDao mDao;
     @Autowired private LocationService lSvc;
     @Override
-    public void registerUser(Users user, String firstName, String secondName) {
+    public void registerUserBy2Names(Users user, String firstName, String secondName) {
         LocationCode locationCode = lSvc.getLocationCodeByFirstNameAndSecondName(firstName, secondName);
+        mDao.insert(user.getUid(), locationCode.getlCode());
+    }
+
+    @Override
+    public void registerUserBy3Names(Users user, String firstName, String secondName, String lastName) {
+        LocationCode locationCode = lSvc.getLocationCodeByFirstNameAndSecondNameAndLastName(firstName, secondName, lastName);
         mDao.insert(user.getUid(), locationCode.getlCode());
     }
 
@@ -25,6 +31,17 @@ public class MyRegionServiceImpl implements MyRegionService{
         System.out.println("first ======================= " + firstName);
         System.out.println("second ======================= " + secondName);
         mDao.update(locationCode.getlCode(), myRegion.getMid());
+    }
+
+    /**
+     *
+     * 3월 18일 기준 작업
+     */
+
+    @Override
+    public MyRegion getMyRegionByUid(String uid) {
+        MyRegion myRegion = mDao.findByUserId(uid);
+        return myRegion;
     }
 
 }

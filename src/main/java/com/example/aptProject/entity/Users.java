@@ -10,13 +10,6 @@ public class Users {
     private LocalDate regDate;
     private int isDeleted;
 
-    public Users(String uid, String pwd, String uname, String email) {
-        this.uid = uid;
-        this.pwd = pwd;
-        this.uname = uname;
-        this.email = email;
-    }
-
     @Override
     public String toString() {
         return "Users{" +
@@ -27,6 +20,13 @@ public class Users {
                 ", regDate=" + regDate +
                 ", isDeleted=" + isDeleted +
                 '}';
+    }
+
+    public Users(String uid, String pwd, String uname, String email) {
+        this.uid = uid;
+        this.pwd = pwd;
+        this.uname = uname;
+        this.email = email;
     }
 
     public String getUid() {
