@@ -19,58 +19,58 @@
 	</header>
 </head>
 <body>
-<div th:fragment="top">
-	<header id="header">
-		<nav class="navbar navbar-expand-sm fixed-top" style="background-color:khaki; padding:0px;" >
-			<div class="container-fluid">
-				<ul class="navbar-nav">
-					<li class="nav-item ms-3">
-						<a class="nav-link"  href="#">
-							<div style="display: flex; flex-direction: column; align-items: center;">
-								<div>
-									<img src="/apt/img/home.png" height="50px;">
+	<div th:fragment="top">
+		<header id="header">
+			<nav class="navbar navbar-expand-sm fixed-top" style="background-color:khaki" >
+				<div class="container-fluid">
+					<ul class="navbar-nav">
+						<li class="nav-item ms-3">
+							<a class="nav-link"  href="#">
+								<div style="display: flex; flex-direction: column; align-items: center;">
+									<div>
+										<img src="/apt/img/home.png" height="70">
+									</div>
 								</div>
-							</div>
-						</a>
-					</li>
-				</ul>
-				<ul class="navbar-nav ms-auto">
-					<li class="nav-item ms-3">
+							</a>
+						</li>
+					</ul>
+					<ul class="navbar-nav ms-auto">
+						<li class="nav-item ms-3">
 							<span th:if="${session.sessUid}">
 								<a class="nav-link" href="/apt/user/update"><i class="fa-solid fa-circle-info"></i> 회원 정보</a>
 							</span>
-					</li>
-					<li class="nav-item ms-3">
+						</li>
+						<li class="nav-item ms-3">
 							<span th:if="${session.sessUid}">
 								<a class="nav-link" href="/apt/user/logout"><i class="fas fa-sign-out-alt"></i> 로그아웃</a>
 							</span>
-						<span th:unless="${session.sessUid}">
+							<span th:unless="${session.sessUid}">
 								<a class="nav-link" href="/apt/user/login"><i class="fas fa-sign-in-alt"></i> 로그인</a>
 							</span>
-					</li>
-					<li class="nav-item ms-3">
+						</li>
+						<li class="nav-item ms-3">
 							<span th:if="${session.sessUid}">
 								<span class="navbar-text me-auto d-flex align-items-center mb-auto">[[${session.sessUname}]]님 환영합니다.</span>
 							</span>
-						<span th:unless="${session.sessUid}">
+							<span th:unless="${session.sessUid}">
 								<a class="nav-link" href="/apt/user/register"><i class="fa-solid fa-circle-user"></i> 회원 가입</a>
 							</span>
-					</li>
-				</ul>
-			</div>
-		</nav>
-	</header>
-</div>
+						</li>
+					</ul>
+				</div>
+			</nav>
+		</header>
+	</div>
+	
 
-
-<footer th:fragment="bottom">
-	<nav class="navbar navbar-expand-sm fixed-bottom" style="background-color:khaki" >
-		<div class="container-fluid justify-content-center">
+	<footer th:fragment="bottom">
+		<nav class="navbar navbar-expand-sm fixed-bottom" style="background-color:khaki" >
+			<div class="container-fluid justify-content-center">
 				<span class="navbar-text">
 					Copyright &copy; .
 				</span>
-		</div>
-	</nav>
-</footer>
+			</div>
+		</nav>
+	</footer>
 </body>
 </html>

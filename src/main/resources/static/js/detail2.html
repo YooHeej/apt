@@ -4,7 +4,7 @@
 <head>
     <div th:insert="~{fragments/base :: header}"></div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.1.1/chart.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const firstNameSelect = document.getElementById('firstNameSelect');
@@ -300,46 +300,28 @@ function displaySidebarContent(apartmentInfo, clickedLat, clickedLng) {
 
     // 그래프 업데이트 함수
     function updateCharts() {
-    console.log(resultList); // resultList 값을 확인하기 위한 console.log 추가
         var ctx1 = document.getElementById("scatterChart1").getContext("2d");
         var scatterChart1 = new Chart(ctx1, {
             type: 'scatter',
             data: {
-                labels: [resultList.년월일],
                 datasets: [{
                     label: "Sample Dataset 1",
-                     data: resultList.map(item => ({
-                        x: new Date(item.년월일),
-                        y: parseFloat(item.거래금액.replace(",", "")),
-                        backgroundColor: getColor(item.전용면적) })),
+                     data: resultList.map(item => ({ x: new Date(item.년월일).getTime(), y: parseFloat(item.거래금액.replace(",", "")), backgroundColor: getColor(item.전용면적) })),
                     radius: 8,
-
-
 
                 }]
             },
             options: {
-            responsive: false,
-            scales: {
-                x: {
-                    type: 'time',
-                    time: {
-                        unit: 'day',
-                    },
-                    position: 'bottom',
-                    min: new Date('2023-01-01'),
-                    max: new Date('2024-03-20')
-                },
-                y: {
-                    type: 'linear',
-                    position: 'left'
+                responsive: false,
+                scales: {
+                    x: {
+                        type: 'linear',
+                        position: 'bottom'
+                    }
                 }
             }
-        }
-    });
-}
-
-
+        });
+    }
 
      function getColor(전용면적) {
         switch (전용면적) {

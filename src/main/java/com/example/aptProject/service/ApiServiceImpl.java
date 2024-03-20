@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 @Service
 public class ApiServiceImpl implements ApiService{
     @Autowired LocationService lSvc;
@@ -64,7 +65,9 @@ public class ApiServiceImpl implements ApiService{
     @Override
     public APIResultIncludeTotalCount getResultList(String numOfRows, String LAWD_CD, String period) throws IOException {
 //        String serviceKey = "rlpbGR9EbYg8iu0YftsAGmUeblmq9qJenXIk7WsVg0qr%2FRXALrab9zfstv0OkO5A15gR4aKR5aO%2FVFtjV6dkfA%3D%3D";
-        String serviceKey = "kSmmxK6j6yUg%2FzHt%2FJ3dYTNRofjKnX0qSSNSWdoqG0gmrChsZRMtUMZMJL8DxU2cwkP%2BOhexSGnPlalb43kNjw%3D%3D";
+//        String serviceKey = "kSmmxK6j6yUg%2FzHt%2FJ3dYTNRofjKnX0qSSNSWdoqG0gmrChsZRMtUMZMJL8DxU2cwkP%2BOhexSGnPlalb43kNjw%3D%3D";
+        
+        String serviceKey = "DQ%2BMipFhZpFTWdYM0MSPjgw4hhio553garORtPqYiNSbH8fZQoHT3v1qBw6OH%2F7CP7vzIAsjzayNoFt015EA0w%3D%3D";
         String pageNo = "1";
         String DEAL_YMD = LocalDate.now().getYear() + String.format("%02d", LocalDate.now().getMonthValue() - 1);
 

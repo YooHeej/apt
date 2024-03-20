@@ -2,9 +2,17 @@
 <html xmlns:th="http://www.w3.org/1999/xhtml">
 
 <head>
-    <div th:insert="~{fragments/base :: header}"></div>
+    <title>Advanced BBS Project</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://kit.fontawesome.com/fdb840a8cc.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.1.1/chart.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const firstNameSelect = document.getElementById('firstNameSelect');
@@ -122,16 +130,19 @@
             /* 초기에는 숨김 */
             position: fixed;
             top: 0;
-            left: 0;
+            right: 0;
             width: 250px;
             height: 500px;
             background-color: #f8f9fa;
             padding: 20px;
             box-shadow: -2px 0 2px rgba(0, 0, 0, 0.1);
             z-index: 999;
-            margin-top: 140px;
         }
 
+        #sidebar-content {
+            margin-top: 80px;
+            /* 사이드바 내용의 상단 여백 설정 */
+        }
     </style>
 </head>
 
@@ -167,20 +178,18 @@
         </table>
     </form>
 </div>
+<div id="map" style="width: 100%;height:500px;"></div>
 <div id="sidebar">
     <div id="sidebar-content"></div>
 </div>
-<div id="map" style="width: 100%;height:500px;"></div>
-
 <script type="text/javascript" src="http://dapi.kakao.com/v2/maps/sdk.js?appkey=01c9675fcc83d5609d3c5d4cf5c18ee2&libraries=services,clusterer"></script>
 
-<footer th:replace="~{fragments/base :: bottom}"></footer>
 <script th:inline="javascript">
     /*<![CDATA[*/
     var mapContainer = document.getElementById('map'), // 지도를 표시할 div
         mapOption = {
             center: new kakao.maps.LatLng([[${session.centerLat}]], [[${session.centerLon}]]), // 지도의 중심좌표
-            level: 7, // 지도의 확대 레벨
+            level: 5, // 지도의 확대 레벨
             mapTypeId: kakao.maps.MapTypeId.ROADMAP // 지도종류
         };
     // 지도를 생성한다
@@ -228,17 +237,12 @@
             image: markerImage // 마커 이미지
         });
 
-       // 마커 클릭 이벤트 등록
-
-       kakao.maps.event.addListener(marker, 'click', function() {
-        // 클릭된 마커의 위도, 경도
-        var clickedLat = position.latlng.getLat();
-        var clickedLng = position.latlng.getLng();
-
-        // 클릭된 마커의 정보를 가져와서 사이드바에 표시하는 함수 호출
-        displaySidebarContent(position.content, clickedLat, clickedLng);
+        // 마커 클릭 이벤트 등록
+        kakao.maps.event.addListener(marker, 'click', function() {
+            // 클릭된 마커의 정보를 가져와서 사이드바에 표시하는 함수 호출
+            displaySidebarContent(position.content);
+        });
     });
-});
 
     // 사이드바 클릭 이벤트 등록
     var sidebar = document.getElementById('sidebar');
@@ -247,44 +251,30 @@
         hideSidebar();
     });
 
+    // 클릭된 마커의 정보를 가져와서 사이드바에 표시하는 함수
+    function displaySidebarContent(apartmentInfo) {
+        // 가져온 아파트 정보를 사이드바에 표시
+        var sidebarContent = document.getElementById('sidebar-content');
+        sidebarContent.innerHTML = `
+        <p>아파트명: ${apartmentInfo.아파트}&nbsp;${apartmentInfo.층}층</p>
+        <p>동: ${apartmentInfo.법정동}</p>
+        <p>도로명: ${apartmentInfo.도로명}</p>
+        <p>건축년도: ${apartmentInfo.건축년도}년</p>
+        <p>거래금액: ${apartmentInfo.거래금액},000원</p>
+        <p>전용면적: ${apartmentInfo.전용면적}m^2</p>
 
-// 클릭된 마커의 정보를 가져와서 사이드바에 표시하는 함수
-function displaySidebarContent(apartmentInfo, clickedLat, clickedLng) {
-    // 사이드바에 표시되는 HTML을 저장할 변수
-    var sidebarHTML = '';
+        <button class="btn btn-primary" onclick="openModal()">그래프 보기</button>
+        <!-- 여기에 필요한 정보를 추가하세요 -->
+    `;
 
-    // resultList에서 중복된 위치를 찾아서 사이드바에 추가
-    resultList.forEach(function(result) {
-        // 중복된 위치인 경우에만 처리
-        if (result.lat === clickedLat && result.lon === clickedLng) {
-            // 가져온 아파트 정보를 사이드바에 추가
-            sidebarHTML += `
-                <p>아파트명: ${result.아파트}&nbsp;${result.층}층</p>
-                <p>동: ${result.법정동}</p>
-                <p>도로명: ${result.도로명}</p>
-                <p>건축년도: ${result.건축년도}년</p>
-                <p>거래금액: ${result.거래금액}만원</p>
-                <p class="ms-2">전용면적: ${result.전용면적}m^2</p>
-                <br>
-                <button class="btn btn-primary" onclick="openModal()">그래프 보기</button>
-                <br>
-                <hr> <!-- 구분을 위한 수평선 추가 -->
-            `;
-        }
-    });
-
-    // 사이드바에 HTML을 적용
-    var sidebarContent = document.getElementById('sidebar-content');
-    sidebarContent.innerHTML = sidebarHTML;
-
-    // 사이드바 보이도록 설정
-    sidebar.style.display = 'block';
-}
+        // 사이드바 보이도록 설정
+        sidebar.style.display = 'block';
+    }
 
     // 사이드바를 숨기는 함수
     function hideSidebar() {
         // 사이드바 숨김 설정
-        sidebar.style.display = 'block';
+        sidebar.style.display = 'none';
     }
 
     // 모달 창 열기
@@ -300,35 +290,31 @@ function displaySidebarContent(apartmentInfo, clickedLat, clickedLng) {
 
     // 그래프 업데이트 함수
     function updateCharts() {
-    console.log(resultList); // resultList 값을 확인하기 위한 console.log 추가
-        var ctx1 = document.getElementById("scatterChart1").getContext("2d");
-        var scatterChart1 = new Chart(ctx1, {
-            type: 'scatter',
-            data: {
-                labels: [resultList.년월일],
-                datasets: [{
-                    label: "Sample Dataset 1",
-                     data: resultList.map(item => ({
-                        x: new Date(item.년월일),
-                        y: parseFloat(item.거래금액.replace(",", "")),
-                        backgroundColor: getColor(item.전용면적) })),
-                    radius: 8,
-
-
-
-                }]
-            },
-            options: {
+    var ctx1 = document.getElementById("scatterChart1").getContext("2d");
+    var scatterChart1 = new Chart(ctx1, {
+        type: 'scatter',
+        data: {
+            labels: [resultList.년월일],
+            datasets: [{
+                label: "Sample Dataset 1",
+                data: resultList.map(item => ({
+                    x: new Date(item.년월일),
+                    y: parseFloat(item.거래금액.replace(",", "")),
+                    backgroundColor: getColor(item.전용면적)
+                })),
+                pointRadius: 8,
+            }]
+        },
+        options: {
             responsive: false,
             scales: {
                 x: {
                     type: 'time',
                     time: {
-                        unit: 'day',
+                        unit: 'month',
                     },
-                    position: 'bottom',
-                    min: new Date('2023-01-01'),
-                    max: new Date('2024-03-20')
+                    
+                    position: 'bottom'
                 },
                 y: {
                     type: 'linear',
@@ -338,8 +324,6 @@ function displaySidebarContent(apartmentInfo, clickedLat, clickedLng) {
         }
     });
 }
-
-
 
      function getColor(전용면적) {
         switch (전용면적) {
@@ -361,6 +345,7 @@ function displaySidebarContent(apartmentInfo, clickedLat, clickedLng) {
     }
     /*]]>*/
 </script>
+<footer th:replace="~{fragments/base :: bottom}"></footer>
 <div id="myModal" class="modal">
     <div class="modal-content">
         <span class="close" onclick="closeModal()">&times;</span>
