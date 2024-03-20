@@ -1,9 +1,12 @@
 package com.example.aptProject.entity;
 
+import java.time.LocalDate;
+
 public class APIResult {
     private String 년;
     private String 월;
     private String 일;
+    private LocalDate 년월일;
     private String 지역코드;
     private String 법정동;
     private String 도로명;
@@ -22,6 +25,7 @@ public class APIResult {
                 "년='" + 년 + '\'' +
                 ", 월='" + 월 + '\'' +
                 ", 일='" + 일 + '\'' +
+                ", 년월일=" + 년월일 +
                 ", 지역코드='" + 지역코드 + '\'' +
                 ", 법정동='" + 법정동 + '\'' +
                 ", 도로명='" + 도로명 + '\'' +
@@ -58,6 +62,14 @@ public class APIResult {
 
     public void set일(String 일) {
         this.일 = 일;
+    }
+
+    public LocalDate get년월일() {
+        return 년월일;
+    }
+
+    public void set년월일(LocalDate 년월일) {
+        this.년월일 = 년월일;
     }
 
     public String get지역코드() {
@@ -148,13 +160,11 @@ public class APIResult {
         this.lat = lat;
     }
 
-    public APIResult() {
-    }
-
-    public APIResult(String 년, String 월, String 일, String 지역코드, String 법정동, String 도로명, String 아파트, String 층, String 전용면적, String 건축년도, String 거래금액, String totalCount, Double lon, Double lat) {
+    public APIResult(String 년, String 월, String 일, LocalDate 년월일, String 지역코드, String 법정동, String 도로명, String 아파트, String 층, String 전용면적, String 건축년도, String 거래금액, String totalCount, Double lon, Double lat) {
         this.년 = 년;
         this.월 = 월;
         this.일 = 일;
+        this.년월일 = 년월일;
         this.지역코드 = 지역코드;
         this.법정동 = 법정동;
         this.도로명 = 도로명;

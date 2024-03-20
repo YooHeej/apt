@@ -5,16 +5,18 @@ import java.util.List;
 public class APIResultIncludeTotalCount {
     private List<APIResult> apiResults;
     private String totalCount;
+    private int notExistCount;
+
+    public APIResultIncludeTotalCount() {
+    }
 
     @Override
     public String toString() {
         return "APIResultIncludeTotalCount{" +
                 "apiResults=" + apiResults +
                 ", totalCount='" + totalCount + '\'' +
+                ", notExistCount=" + notExistCount +
                 '}';
-    }
-
-    public APIResultIncludeTotalCount() {
     }
 
     public List<APIResult> getApiResults() {
@@ -33,8 +35,17 @@ public class APIResultIncludeTotalCount {
         this.totalCount = totalCount;
     }
 
-    public APIResultIncludeTotalCount(List<APIResult> apiResults, String totalCount) {
+    public int getNotExistCount() {
+        return notExistCount;
+    }
+
+    public void setNotExistCount(int notExistCount) {
+        this.notExistCount = notExistCount;
+    }
+
+    public APIResultIncludeTotalCount(List<APIResult> apiResults, String totalCount, int notExistCount) {
         this.apiResults = apiResults;
         this.totalCount = totalCount;
+        this.notExistCount = notExistCount;
     }
 }

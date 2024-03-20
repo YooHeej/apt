@@ -25,6 +25,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,6 +48,7 @@ public class mapController {
 
     @GetMapping("getResult/{LAWD_CD}/{period}")
     public String getResult(@PathVariable String LAWD_CD, @PathVariable String period, HttpSession session, Model model) throws IOException, ParseException {
+//        String totalCount = "100000";
         String totalCount = apiService.getTotalCount(LAWD_CD, period);
         Map<String, Double> center = new HashMap<>();
 
@@ -59,15 +61,17 @@ public class mapController {
         session.setAttribute("centerLon", lon);
         session.setAttribute("centerLat", lat);
 
-        session.setAttribute("totalCount",totalCount);
+        session.setAttribute("totalCount",resultList.size());
         System.out.println("totalCount ======= " + totalCount);
+        System.out.println("notExistCount -------- " + result.getNotExistCount());
+        System.out.println("resultlist==============" + resultList.size());
         model.addAttribute("resultList", resultList);
 
         List<String> firstNames = lSvc.getAllFirstNames();
         model.addAttribute("firstNames", firstNames);
 
 
-        return "map/detail5";
+        return "map/detail2";
     }
 
 
@@ -95,7 +99,7 @@ public class mapController {
     public String searchProc(String firstName, String secondName, String lastName, String period) {
 
         int lCode = 0;
-        if(lastName == ""){
+        if(lastName.isEmpty()){
             lCode = lSvc.getLocationCodeByFirstNameAndSecondName(firstName, secondName).getlCode();
         }else{
             lCode = lSvc.getLocationCodeByFirstNameAndSecondNameAndLastName(firstName, secondName, lastName).getlCode();

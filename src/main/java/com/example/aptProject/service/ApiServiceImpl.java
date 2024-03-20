@@ -21,6 +21,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -62,7 +63,8 @@ public class ApiServiceImpl implements ApiService{
 
     @Override
     public APIResultIncludeTotalCount getResultList(String numOfRows, String LAWD_CD, String period) throws IOException {
-        String serviceKey = "rlpbGR9EbYg8iu0YftsAGmUeblmq9qJenXIk7WsVg0qr%2FRXALrab9zfstv0OkO5A15gR4aKR5aO%2FVFtjV6dkfA%3D%3D";
+//        String serviceKey = "rlpbGR9EbYg8iu0YftsAGmUeblmq9qJenXIk7WsVg0qr%2FRXALrab9zfstv0OkO5A15gR4aKR5aO%2FVFtjV6dkfA%3D%3D";
+        String serviceKey = "kSmmxK6j6yUg%2FzHt%2FJ3dYTNRofjKnX0qSSNSWdoqG0gmrChsZRMtUMZMJL8DxU2cwkP%2BOhexSGnPlalb43kNjw%3D%3D";
         String pageNo = "1";
         String DEAL_YMD = LocalDate.now().getYear() + String.format("%02d", LocalDate.now().getMonthValue() - 1);
 
@@ -71,7 +73,9 @@ public class ApiServiceImpl implements ApiService{
         List<APIResult> resultList = new ArrayList<>();
         int count = 0;
         String totalCount ="";
+        int notExistCount = 0;
         for(int k = 0; k<Integer.parseInt(period); k++){
+            System.out.println("여기부터가 한번 호출!!!!!!!!");
             int year = LocalDate.now().getYear(); // 현재 연도
             int month = LocalDate.now().getMonthValue() - 1; // 현재 월
             if (month - k <= 0) {
@@ -86,12 +90,10 @@ public class ApiServiceImpl implements ApiService{
             try {
                 // XML 문자열
                 String xmlString = sb.toString();
-
                 // XML 파서 생성
                 DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
                 DocumentBuilder builder = factory.newDocumentBuilder();
                 InputStream inputStream = new ByteArrayInputStream(xmlString.getBytes());
-
                 // XML 파싱
                 Document doc = builder.parse(inputStream);
                 doc.getDocumentElement().normalize();
@@ -108,46 +110,68 @@ public class ApiServiceImpl implements ApiService{
                         String 거래금액 = itemElement.getElementsByTagName("거래금액").item(0).getTextContent().trim();
                         String 건축년도 = itemElement.getElementsByTagName("건축년도").item(0).getTextContent().trim();
                         String 년 = itemElement.getElementsByTagName("년").item(0).getTextContent().trim();
+                        if(itemElement.getElementsByTagName("도로명").item(0) == null){
+                            notExistCount +=1;
+                            continue;
+                        }
                         String 도로명 = itemElement.getElementsByTagName("도로명").item(0).getTextContent().trim();
+
                         String 법정동 = itemElement.getElementsByTagName("법정동").item(0).getTextContent().trim();
                         String 아파트 = itemElement.getElementsByTagName("아파트").item(0).getTextContent().trim();
                         String 월 = itemElement.getElementsByTagName("월").item(0).getTextContent().trim();
                         String 일 = itemElement.getElementsByTagName("일").item(0).getTextContent().trim();
+                        // 월과 일이 한 자리인 경우 앞에 0을 붙여 두 자리로 만듭니다.
+                        if (월.length() == 1) {
+                            월 = "0" + 월;
+                        }
+                        if (일.length() == 1) {
+                            일 = "0" + 일;
+                        }
+                        // 변환 패턴 지정
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+                        String tmp = 년 + 월 + 일;
+                        LocalDate 년월일 = LocalDate.parse(tmp, formatter);
+
                         String 전용면적 = itemElement.getElementsByTagName("전용면적").item(0).getTextContent().trim();
                         String 지역코드 = itemElement.getElementsByTagName("지역코드").item(0).getTextContent().trim();
                         String 층 = itemElement.getElementsByTagName("층").item(0).getTextContent().trim();
 
                         String addr = "";
                         addr = lSvc.getLocationName(Integer.parseInt(지역코드)) + " " + 도로명;
+
+
                         Map<String, Double> map = getGeoCode(addr);
 
-                        apiResult = new APIResult(년, 월, 일, 지역코드, 법정동, 도로명, 아파트, 층, 전용면적, 건축년도, 거래금액, totalCount, map.get("lon"), map.get("lat"));
-
-                        System.out.println("년: " + 년);
-                        System.out.println("월: " + 월);
-                        System.out.println("일: " + 일);
-                        System.out.println("지역코드: " + 지역코드);
-                        System.out.println("법정동: " + 법정동);
-                        System.out.println("도로명: " + 도로명);
-                        System.out.println("아파트: " + 아파트);
-                        System.out.println("층: " + 층);
-                        System.out.println("전용면적(m^2): " + 전용면적);
-                        System.out.println("건축년도: " + 건축년도);
-                        System.out.println("거래금액(만): " + 거래금액);
-                        System.out.println("lat: " + map.get("lat"));
-                        System.out.println("lon: " + map.get("lon"));
-                        System.out.println("---");
+                        if (map != null) { // 도로명 주소의 위도와 경도가 있는 경우에만 결과에 추가
+                            apiResult = new APIResult(년, 월, 일, 년월일, 지역코드, 법정동, 도로명, 아파트, 층, 전용면적, 건축년도, 거래금액, totalCount, map.get("lon"), map.get("lat"));
+                            resultList.add(apiResult);
+                            System.out.println("년: " + 년);
+                            System.out.println("월: " + 월);
+                            System.out.println("일: " + 일);
+                            System.out.println("년월일: " + 년월일);
+                            System.out.println("지역코드: " + 지역코드);
+                            System.out.println("법정동: " + 법정동);
+                            System.out.println("도로명: " + 도로명);
+                            System.out.println("아파트: " + 아파트);
+                            System.out.println("층: " + 층);
+                            System.out.println("전용면적(m^2): " + 전용면적);
+                            System.out.println("건축년도: " + 건축년도);
+                            System.out.println("거래금액(만): " + 거래금액);
+                            System.out.println("totalCount ====== " + count);
+                            System.out.println("lat: " + map.get("lat"));
+                            System.out.println("lon: " + map.get("lon"));
+                            System.out.println("notExistCount: " + notExistCount);
+                            System.out.println("---");
+                        }
                     }
-                    resultList.add(apiResult);
-
                 }
             } catch (Exception e) {
+                notExistCount += 1;
                 e.printStackTrace();
             }
-
         }
         totalCount = String.valueOf(count);
-        APIResultIncludeTotalCount result = new APIResultIncludeTotalCount(resultList, totalCount);
+        APIResultIncludeTotalCount result = new APIResultIncludeTotalCount(resultList, totalCount, notExistCount);
 
         return result;
 
@@ -163,14 +187,14 @@ public class ApiServiceImpl implements ApiService{
         URL url = new URL(apiUrl);
         // Header setting
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-//		conn.setRequestMethod("GET");
         conn.setRequestProperty("Authorization", "KakaoAK " + kakaoKey);
-//		conn.setRequestProperty("content-type", "application/json");
-//		conn.setDoOutput(true);
 
         // 응답 결과 확인
         int responseCode = conn.getResponseCode();
-//		System.out.println(responseCode);
+        if (responseCode != HttpURLConnection.HTTP_OK) {
+            System.out.println("API 호출에 실패했습니다. 응답 코드: " + responseCode);
+            return null; // 실패한 경우 null 반환
+        }
 
         BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "utf-8"));
         StringBuffer sb = new StringBuffer();
@@ -178,17 +202,19 @@ public class ApiServiceImpl implements ApiService{
         while((line = br.readLine()) != null)
             sb.append(line);
         br.close();
-//		System.out.println(sb.toString());
 
         // JSON 데이터에서 원하는 값 추출하기
         JSONParser parser = new JSONParser();
         JSONObject object = (JSONObject) parser.parse(sb.toString());
         JSONArray documents = (JSONArray) object.get("documents");
+        if (documents.isEmpty()) {
+            System.out.println("도로명 주소 검색 결과가 없습니다.");
+            return null; // 검색 결과가 없는 경우 null 반환
+        }
+
         JSONObject item = (JSONObject) documents.get(0);
-//    	System.out.println(item.keySet());	// [address, address_type, x, y, address_name, road_address]
         String lon_ = (String) item.get("x");
         String lat_ = (String) item.get("y");
-//    	System.out.println(lon_ + ", " + lat_);
 
         Map<String, Double> map = new HashMap<String, Double>();
         map.put("lon", Double.parseDouble(lon_));
