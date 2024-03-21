@@ -3,8 +3,6 @@
 
 <head>
     <div th:insert="~{fragments/base :: header}"></div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.1.1/chart.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const firstNameSelect = document.getElementById('firstNameSelect');
@@ -130,6 +128,7 @@
             box-shadow: -2px 0 2px rgba(0, 0, 0, 0.1);
             z-index: 999;
             margin-top: 140px;
+            overflow: auto;
         }
 
     </style>
@@ -168,11 +167,17 @@
     </form>
 </div>
 <div id="sidebar">
+    <p>아파트 이름: <span id="apt"></span> </p>
+    <p>주소: <span id="address"></span> </p>
+    <p>총 거래건수: <span id="total"></span>개</p>
+    <button class="btn btn-primary" onclick="openModal()">그래프</button>
+    <br><hr>
     <div id="sidebar-content"></div>
 </div>
 <div id="map" style="width: 100%;height:500px;"></div>
 
 <script type="text/javascript" src="http://dapi.kakao.com/v2/maps/sdk.js?appkey=01c9675fcc83d5609d3c5d4cf5c18ee2&libraries=services,clusterer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.1.1/chart.min.js"></script>
 
 <footer th:replace="~{fragments/base :: bottom}"></footer>
 <script th:inline="javascript">
@@ -180,7 +185,7 @@
     var mapContainer = document.getElementById('map'), // 지도를 표시할 div
         mapOption = {
             center: new kakao.maps.LatLng([[${session.centerLat}]], [[${session.centerLon}]]), // 지도의 중심좌표
-            level: 7, // 지도의 확대 레벨
+            level: 8, // 지도의 확대 레벨
             mapTypeId: kakao.maps.MapTypeId.ROADMAP // 지도종류
         };
     // 지도를 생성한다
@@ -252,26 +257,32 @@
 function displaySidebarContent(apartmentInfo, clickedLat, clickedLng) {
     // 사이드바에 표시되는 HTML을 저장할 변수
     var sidebarHTML = '';
-
+    var total = 0;
+    var apt = apartmentInfo['아파트'];
+    var address = apartmentInfo['법정동'] + ' ' + apartmentInfo['도로명'] + ' ' + apartmentInfo['도로명건물본번호코드'];
     // resultList에서 중복된 위치를 찾아서 사이드바에 추가
     resultList.forEach(function(result) {
         // 중복된 위치인 경우에만 처리
         if (result.lat === clickedLat && result.lon === clickedLng) {
+             total++;
             // 가져온 아파트 정보를 사이드바에 추가
             sidebarHTML += `
-                <p>아파트명: ${result.아파트}&nbsp;${result.층}층</p>
-                <p>동: ${result.법정동}</p>
-                <p>도로명: ${result.도로명}</p>
-                <p>건축년도: ${result.건축년도}년</p>
+                <p>거래일: ${result.년}-${result.월}-${result.일}</p>
                 <p>거래금액: ${result.거래금액}만원</p>
-                <p class="ms-2">전용면적: ${result.전용면적}m^2</p>
-                <br>
-                <button class="btn btn-primary" onclick="openModal()">그래프 보기</button>
+                <p>전용면적: ${result.전용면적}㎡</p>
                 <br>
                 <hr> <!-- 구분을 위한 수평선 추가 -->
             `;
         }
     });
+    apt = apartmentInfo['아파트'];
+    address = apartmentInfo['법정동'] + ' ' + apartmentInfo['도로명'] + ' ' + apartmentInfo['도로명건물본번호코드'];
+
+     document.getElementById('total').textContent = total;
+     document.getElementById('apt').textContent = apt;
+     document.getElementById('address').textContent = address;
+
+
 
     // 사이드바에 HTML을 적용
     var sidebarContent = document.getElementById('sidebar-content');
@@ -298,47 +309,30 @@ function displaySidebarContent(apartmentInfo, clickedLat, clickedLng) {
         document.getElementById("myModal").style.display = "none";
     }
 
-    // 그래프 업데이트 함수
-    function updateCharts() {
-    console.log(resultList); // resultList 값을 확인하기 위한 console.log 추가
+     // 그래프 업데이트 함수
+     function updateCharts() {
         var ctx1 = document.getElementById("scatterChart1").getContext("2d");
         var scatterChart1 = new Chart(ctx1, {
             type: 'scatter',
             data: {
-                labels: [resultList.년월일],
                 datasets: [{
                     label: "Sample Dataset 1",
-                     data: resultList.map(item => ({
-                        x: new Date(item.년월일),
-                        y: parseFloat(item.거래금액.replace(",", "")),
-                        backgroundColor: getColor(item.전용면적) })),
+                    data: resultList.map(item => ({x: new Date(parseInt(item.년월일.replace(/-/g,""))), y: parseFloat(item.거래금액.replace(",", "")), backgroundColor: getColor(item.전용면적) })),
                     radius: 8,
-
-
 
                 }]
             },
             options: {
-            responsive: false,
-            scales: {
-                x: {
-                    type: 'time',
-                    time: {
-                        unit: 'month',
-                    },
-                    position: 'bottom',
-                    min: new Date('2023-01-01'),
-                    max: new Date('2024-03-20')
-                },
-                y: {
-                    type: 'linear',
-                    position: 'left'
+                responsive: false,
+                scales: {
+                    x: {
+                        type: 'linear',
+                        position: 'bottom'
+                    }
                 }
             }
-        }
-    });
-}
-
+        });
+    }
 
 
      function getColor(전용면적) {
@@ -356,7 +350,7 @@ function displaySidebarContent(apartmentInfo, clickedLat, clickedLng) {
             case "전용면적6":
                 return 'lightblue';
             default:
-                return 'red'; // 기본 색상
+                return 'black'; // 기본 색상
         }
     }
     /*]]>*/

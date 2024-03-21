@@ -65,9 +65,9 @@ public class ApiServiceImpl implements ApiService{
 
     @Override
     public APIResultIncludeTotalCount getResultList(String numOfRows, String LAWD_CD, String period) throws IOException {
- //      String serviceKey = "rlpbGR9EbYg8iu0YftsAGmUeblmq9qJenXIk7WsVg0qr%2FRXALrab9zfstv0OkO5A15gR4aKR5aO%2FVFtjV6dkfA%3D%3D";     // 기준이 형
+       String serviceKey = "rlpbGR9EbYg8iu0YftsAGmUeblmq9qJenXIk7WsVg0qr%2FRXALrab9zfstv0OkO5A15gR4aKR5aO%2FVFtjV6dkfA%3D%3D";     // 기준이 형
   //     String serviceKey = "m6VKwfm7ZHeugZXEw7laLFAM41rMMp3kK21%2BOF7pXCi3bA64o8KwZhVpG627gfD2Y5Bl34RCb8%2B3PR2AqL%2BGHQ%3D%3D";     // 시연누나
-      String serviceKey = "kSmmxK6j6yUg%2FzHt%2FJ3dYTNRofjKnX0qSSNSWdoqG0gmrChsZRMtUMZMJL8DxU2cwkP%2BOhexSGnPlalb43kNjw%3D%3D";  // 도현
+//      String serviceKey = "kSmmxK6j6yUg%2FzHt%2FJ3dYTNRofjKnX0qSSNSWdoqG0gmrChsZRMtUMZMJL8DxU2cwkP%2BOhexSGnPlalb43kNjw%3D%3D";  // 도현
     //  String serviceKey = "VGyeLICpqeNan%2FeK8Z%2FQZtRWwlEnqokjASqIvw6DOui%2FkKBrk2nJ%2FDLlP4Psl3X4Hm05JQmAULE9Ly5h66%2F%2BDA%3D%3D ";  // 희재
         String pageNo = "1";
         String DEAL_YMD = LocalDate.now().getYear() + String.format("%02d", LocalDate.now().getMonthValue() - 1);
@@ -204,7 +204,7 @@ public class ApiServiceImpl implements ApiService{
 
     @Override
     public Map<String, Double> getGeoCode(String addr) throws IOException, ParseException {
-        String kakaoKey = "53f0f1441d99a7c87f4d29410ab21e7e";
+        String kakaoKey = "4024c53f7f92ac3cc4f0e6d022b469ad";
         String query = URLEncoder.encode(addr, "utf-8");
         String apiUrl = "https://dapi.kakao.com/v2/local/search/address.json"
                 + "?query=" + query;

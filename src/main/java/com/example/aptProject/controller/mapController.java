@@ -71,7 +71,7 @@ public class mapController {
         model.addAttribute("firstNames", firstNames);
 
 
-        return "map/detail2";
+        return "map/detail13";
     }
 
 
