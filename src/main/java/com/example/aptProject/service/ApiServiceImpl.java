@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 
+
 @Service
 public class ApiServiceImpl implements ApiService{
     @Autowired LocationService lSvc;
@@ -64,13 +65,14 @@ public class ApiServiceImpl implements ApiService{
 
     @Override
     public APIResultIncludeTotalCount getResultList(String numOfRows, String LAWD_CD, String period) throws IOException {
-//        String serviceKey = "rlpbGR9EbYg8iu0YftsAGmUeblmq9qJenXIk7WsVg0qr%2FRXALrab9zfstv0OkO5A15gR4aKR5aO%2FVFtjV6dkfA%3D%3D";
-//        String serviceKey = "kSmmxK6j6yUg%2FzHt%2FJ3dYTNRofjKnX0qSSNSWdoqG0gmrChsZRMtUMZMJL8DxU2cwkP%2BOhexSGnPlalb43kNjw%3D%3D";
-        
-        String serviceKey = "DQ%2BMipFhZpFTWdYM0MSPjgw4hhio553garORtPqYiNSbH8fZQoHT3v1qBw6OH%2F7CP7vzIAsjzayNoFt015EA0w%3D%3D";
+ //      String serviceKey = "rlpbGR9EbYg8iu0YftsAGmUeblmq9qJenXIk7WsVg0qr%2FRXALrab9zfstv0OkO5A15gR4aKR5aO%2FVFtjV6dkfA%3D%3D";     // 기준이 형
+  //     String serviceKey = "m6VKwfm7ZHeugZXEw7laLFAM41rMMp3kK21%2BOF7pXCi3bA64o8KwZhVpG627gfD2Y5Bl34RCb8%2B3PR2AqL%2BGHQ%3D%3D";     // 시연누나
+      String serviceKey = "kSmmxK6j6yUg%2FzHt%2FJ3dYTNRofjKnX0qSSNSWdoqG0gmrChsZRMtUMZMJL8DxU2cwkP%2BOhexSGnPlalb43kNjw%3D%3D";  // 도현
+    //  String serviceKey = "VGyeLICpqeNan%2FeK8Z%2FQZtRWwlEnqokjASqIvw6DOui%2FkKBrk2nJ%2FDLlP4Psl3X4Hm05JQmAULE9Ly5h66%2F%2BDA%3D%3D ";  // 희재
         String pageNo = "1";
         String DEAL_YMD = LocalDate.now().getYear() + String.format("%02d", LocalDate.now().getMonthValue() - 1);
 
+       // 문자열로 나오네  System.out.println("ㄴㅇㄴㅇㄴㅇㄴㅇㄴㅇ ============" + DEAL_YMD);
 
         APIResult apiResult = null;
         List<APIResult> resultList = new ArrayList<>();
@@ -79,15 +81,29 @@ public class ApiServiceImpl implements ApiService{
         int notExistCount = 0;
         for(int k = 0; k<Integer.parseInt(period); k++){
             System.out.println("여기부터가 한번 호출!!!!!!!!");
+
             int year = LocalDate.now().getYear(); // 현재 연도
-            int month = LocalDate.now().getMonthValue() - 1; // 현재 월
-            if (month - k <= 0) {
-                year -= 1; // 연도 조정
-                month = 12 - (k - month); // 월 조정
+            int month = LocalDate.now().getMonthValue() -1; // 현재 월
+
+            // k 값에 따라 연도와 월을 조정
+            if (k >= 12) {
+                int yearsToSubtract = k / 12;
+                int monthsToSubtract = k % 12;
+                year -= yearsToSubtract;
+                month -= monthsToSubtract;
+
+                // 월이 음수가 되면 연도를 조정
+                if (month <= 0) {
+                    year -= 1;
+                    month += 12;
+                }
             } else {
                 month -= k;
+                if (month <= 0) {
+                    year -= 1;
+                    month += 12;
+                }
             }
-
             DEAL_YMD = year + String.format("%02d", month);
             StringBuilder sb = getAPIResult(serviceKey, pageNo, numOfRows, LAWD_CD, DEAL_YMD);
             try {
@@ -118,7 +134,9 @@ public class ApiServiceImpl implements ApiService{
                             continue;
                         }
                         String 도로명 = itemElement.getElementsByTagName("도로명").item(0).getTextContent().trim();
-
+                        String 도로명건물본번호코드 = itemElement.getElementsByTagName("도로명건물본번호코드").item(0).getTextContent().trim();
+                        int tmpFor도로명 = Integer.parseInt(도로명건물본번호코드);
+                        도로명건물본번호코드 = String.valueOf(tmpFor도로명);
                         String 법정동 = itemElement.getElementsByTagName("법정동").item(0).getTextContent().trim();
                         String 아파트 = itemElement.getElementsByTagName("아파트").item(0).getTextContent().trim();
                         String 월 = itemElement.getElementsByTagName("월").item(0).getTextContent().trim();
@@ -133,20 +151,23 @@ public class ApiServiceImpl implements ApiService{
                         // 변환 패턴 지정
                         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
                         String tmp = 년 + 월 + 일;
-                        LocalDate 년월일 = LocalDate.parse(tmp, formatter);
+                        LocalDate 년월일 = LocalDate.parse(tmp, formatter);        //여기 한번 확인
+
 
                         String 전용면적 = itemElement.getElementsByTagName("전용면적").item(0).getTextContent().trim();
                         String 지역코드 = itemElement.getElementsByTagName("지역코드").item(0).getTextContent().trim();
                         String 층 = itemElement.getElementsByTagName("층").item(0).getTextContent().trim();
 
                         String addr = "";
-                        addr = lSvc.getLocationName(Integer.parseInt(지역코드)) + " " + 도로명;
+                        addr = lSvc.getLocationName(Integer.parseInt(지역코드)) + " " + 도로명 + " " + 도로명건물본번호코드;
 
+                        String 해제여부 = itemElement.getElementsByTagName("해제여부").item(0).getTextContent().trim();
 
                         Map<String, Double> map = getGeoCode(addr);
+                        System.out.println("map ================= " + map);
 
-                        if (map != null) { // 도로명 주소의 위도와 경도가 있는 경우에만 결과에 추가
-                            apiResult = new APIResult(년, 월, 일, 년월일, 지역코드, 법정동, 도로명, 아파트, 층, 전용면적, 건축년도, 거래금액, totalCount, map.get("lon"), map.get("lat"));
+                        if (map != null && 해제여부.isEmpty()) { // 도로명 주소의 위도와 경도가 있는 경우에만 결과에 추가
+                            apiResult = new APIResult(년, 월, 일, 년월일, 지역코드, 법정동, 도로명, 도로명건물본번호코드, 아파트, 층, 전용면적, 건축년도, 거래금액, totalCount, map.get("lon"), map.get("lat"));
                             resultList.add(apiResult);
                             System.out.println("년: " + 년);
                             System.out.println("월: " + 월);
@@ -160,11 +181,12 @@ public class ApiServiceImpl implements ApiService{
                             System.out.println("전용면적(m^2): " + 전용면적);
                             System.out.println("건축년도: " + 건축년도);
                             System.out.println("거래금액(만): " + 거래금액);
-                            System.out.println("totalCount ====== " + count);
                             System.out.println("lat: " + map.get("lat"));
                             System.out.println("lon: " + map.get("lon"));
                             System.out.println("notExistCount: " + notExistCount);
                             System.out.println("---");
+                        }else {
+                            notExistCount +=1;
                         }
                     }
                 }
@@ -249,6 +271,7 @@ public class ApiServiceImpl implements ApiService{
     public String getTotalCount(String LAWD_CD, String period) throws IOException {
         return getResultList("1", LAWD_CD, period).getTotalCount();
     }
+
 
     //법정동 코드.txt파일 데이터 전처리 하고 insert 쿼리문으로 변경해주는 코드
     public static List<List<String>> filterAndParseDataFromFile(String filename) {

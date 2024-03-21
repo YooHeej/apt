@@ -10,6 +10,7 @@ public class APIResult {
     private String 지역코드;
     private String 법정동;
     private String 도로명;
+    private String 도로명건물본번호코드;
     private String 아파트;
     private String 층;
     private String 전용면적;
@@ -29,6 +30,7 @@ public class APIResult {
                 ", 지역코드='" + 지역코드 + '\'' +
                 ", 법정동='" + 법정동 + '\'' +
                 ", 도로명='" + 도로명 + '\'' +
+                ", 도로명건물본번호코드='" + 도로명건물본번호코드 + '\'' +
                 ", 아파트='" + 아파트 + '\'' +
                 ", 층='" + 층 + '\'' +
                 ", 전용면적='" + 전용면적 + '\'' +
@@ -96,6 +98,14 @@ public class APIResult {
         this.도로명 = 도로명;
     }
 
+    public String get도로명건물본번호코드() {
+        return 도로명건물본번호코드;
+    }
+
+    public void set도로명건물본번호코드(String 도로명건물본번호코드) {
+        this.도로명건물본번호코드 = 도로명건물본번호코드;
+    }
+
     public String get아파트() {
         return 아파트;
     }
@@ -160,7 +170,10 @@ public class APIResult {
         this.lat = lat;
     }
 
-    public APIResult(String 년, String 월, String 일, LocalDate 년월일, String 지역코드, String 법정동, String 도로명, String 아파트, String 층, String 전용면적, String 건축년도, String 거래금액, String totalCount, Double lon, Double lat) {
+    public APIResult() {
+    }
+
+    public APIResult(String 년, String 월, String 일, LocalDate 년월일, String 지역코드, String 법정동, String 도로명, String 도로명건물본번호코드, String 아파트, String 층, String 전용면적, String 건축년도, String 거래금액, String totalCount, Double lon, Double lat) {
         this.년 = 년;
         this.월 = 월;
         this.일 = 일;
@@ -168,6 +181,7 @@ public class APIResult {
         this.지역코드 = 지역코드;
         this.법정동 = 법정동;
         this.도로명 = 도로명;
+        this.도로명건물본번호코드 = 도로명건물본번호코드;
         this.아파트 = 아파트;
         this.층 = 층;
         this.전용면적 = 전용면적;
